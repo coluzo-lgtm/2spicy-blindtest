@@ -1,12 +1,12 @@
 :root {
-  --bg: #16091f;
-  --bg2: #24102f;
-  --pink: #ff3b6b;
-  --orange: #ff8c3b;
-  --yellow: #ffd23b;
+  --bg: #08081c;
+  --bg2: #150c3d;
+  --pink: #F60097;
+  --blue: #101FDE;
+  --yellow: #FCFA0B;
   --green: #3bffb0;
   --text: #fff4ec;
-  --muted: #c9a9c9;
+  --muted: #b3aee0;
   --card: rgba(255, 255, 255, 0.06);
   --card-border: rgba(255, 255, 255, 0.12);
 }
@@ -17,7 +17,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: radial-gradient(circle at 20% 0%, #3a1240 0%, var(--bg) 55%), var(--bg);
+  background: radial-gradient(circle at 20% 0%, var(--bg2) 0%, var(--bg) 55%), var(--bg);
   color: var(--text);
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   -webkit-tap-highlight-color: transparent;
@@ -35,7 +35,7 @@ html, body {
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: 1px;
-  background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow));
+  background: linear-gradient(90deg, var(--pink), var(--blue), var(--yellow));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -85,8 +85,8 @@ button {
   border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1a0a1f;
-  background: linear-gradient(90deg, var(--yellow), var(--orange));
+  color: #0a0a1f;
+  background: linear-gradient(90deg, var(--yellow), var(--pink));
 }
 .btn-primary:active { transform: scale(0.98); }
 
@@ -103,9 +103,9 @@ button {
   border-radius: 50%;
   font-size: 1.8rem;
   font-weight: 900;
-  color: #1a0a1f;
-  background: radial-gradient(circle at 35% 30%, #ffe08a, var(--orange) 55%, var(--pink) 100%);
-  box-shadow: 0 0 0 8px rgba(255,59,107,0.12), 0 10px 40px rgba(255, 59, 107, 0.35);
+  color: #0a0a1f;
+  background: radial-gradient(circle at 35% 30%, #fffcb0, var(--yellow) 45%, var(--pink) 100%);
+  box-shadow: 0 0 0 8px rgba(246,0,151,0.15), 0 10px 40px rgba(16,31,222,0.45);
   margin: 30px auto;
   display: flex;
   align-items: center;
@@ -172,7 +172,7 @@ button {
   margin-top: 14px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(255,59,107,0.15);
+  background: rgba(246,0,151,0.15);
   color: var(--pink);
   font-weight: 700;
   font-size: 0.9rem;
