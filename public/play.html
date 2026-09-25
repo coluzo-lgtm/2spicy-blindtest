@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>2 Spicy — Buzz</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">🌶️ 2 SPICY 🌶️</div>
+  <div class="sub">Blind Test</div>
+
+  <div id="joinScreen" class="card">
+    <input type="text" id="teamName" placeholder="Nom de votre équipe" maxlength="24" autofocus />
+    <button class="btn-primary" id="joinBtn">Rejoindre</button>
+    <div class="error" id="joinError"></div>
+  </div>
+
+  <div id="gameScreen" style="display:none; width:100%; display:flex; flex-direction:column; align-items:center;">
+    <div class="team-pill" id="teamPill"></div>
+    <div class="score-big" id="myScore">0</div>
+
+    <div class="buzz-btn" id="buzzBtn">BUZZ !</div>
+    <div class="status-line" id="statusLine">En attente...</div>
+
+    <div class="mini-board" id="miniBoard"></div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+const joinScreen = document.getElementById('joinScreen');
+const gameScreen = document.getElementById('gameScreen');
+const teamNameInput = document.getElementById('teamName');
+const joinBtn = document.getElementById('joinBtn');
+const joinError = document.getElementById('joinError');
+const teamPill = document.getElementById('teamPill');
+const myScore = document.getElementById('myScore');
+const buzzBtn = document.getElementById('buzzBtn');
+const statusLine = document.getElementById('statusLine');
+const miniBoard = document.getElementById('miniBoard');
+
+let myId = localStorage.getItem('2spicy_teamId');
+let myToken = localStorage.getItem('2spicy_token');
+let latestState = null;
+let hasBuzzedThisRound = false;
+
+function doJoin(name) {
+  socket.emit('join', { name, rejoinId: myId, rejoinToken: myToken });
+}
+
+if (myId && myToken) {
+  doJoin('');
+}
+
+joinBtn.addEventListener('click', () => {
+  const name = teamNameInput.value.trim();
+  if (!name) { joinError.textContent = "Entrez un nom d'équipe."; return; }
+  joinError.textContent = '';
+  doJoin(name);
+});
+teamNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') joinBtn.click(); });
+
+socket.on('joinError', (msg) => { joinError.textContent = msg; });
+
+socket.on('joined', ({ teamId, token }) => {
+  myId = teamId;
+  myToken = token;
+  localStorage.setItem('2spicy_teamId', teamId);
+  localStorage.setItem('2spicy_token', token);
+  joinScreen.style.display = 'none';
+  gameScreen.style.display = 'flex';
+});
+
+buzzBtn.addEventListener('click', () => {
+  if (buzzBtn.classList.contains('disabled') || buzzBtn.classList.contains('buzzed')) return;
+  socket.emit('buzz');
+  if (navigator.vibrate) navigator.vibrate(80);
+});
+
+socket.on('state', (state) => {
+  latestState = state;
+  render();
+});
+
+function render() {
+  if (!latestState || !myId || !latestState.teams[myId]) return;
+  const me = latestState.teams[myId];
+
+  teamPill.innerHTML = `<span class="dot" style="background:${me.color}"></span>${me.name}`;
+  myScore.textContent = me.score;
+
+  const inQueue = latestState.queue.some(q => q.teamId === myId);
+  const position = latestState.queue.findIndex(q => q.teamId === myId);
+
+  buzzBtn.classList.remove('disabled', 'buzzed');
+
+  if (me.locked) {
+    buzzBtn.classList.add('disabled');
+    buzzBtn.textContent = 'BLOQUÉ';
+    statusLine.innerHTML = `Vous ne pouvez pas jouer ce tour <span class="locked-tag">🔒 manche suivante</span>`;
+  } else if (!latestState.buzzOpen) {
+    buzzBtn.classList.add('disabled');
+    buzzBtn.textContent = 'BUZZ !';
+    statusLine.textContent = 'En attente du prochain morceau...';
+  } else if (inQueue) {
+    buzzBtn.classList.add('buzzed');
+    buzzBtn.textContent = '✓';
+    statusLine.textContent = position === 0
+      ? '🔥 Vous avez buzzé en premier !'
+      : `Vous avez buzzé en position ${position + 1}`;
+  } else {
+    buzzBtn.textContent = 'BUZZ !';
+    statusLine.textContent = 'À vous de jouer !';
+  }
+
+  const sorted = Object.values(latestState.teams).sort((a, b) => b.score - a.score);
+  miniBoard.innerHTML = sorted.map(t => `
+    <div class="mini-row">
+      <span class="name"><span class="dot" style="background:${t.color}"></span>${t.name}${t.id === myId ? ' (vous)' : ''}</span>
+      <span class="pts">${t.score}</span>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>

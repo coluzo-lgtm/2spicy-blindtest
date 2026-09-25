@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2 Spicy — Contrôle</title>
+<link rel="stylesheet" href="style.css" />
+<style>
+  .wrap { max-width: 900px; margin: 0 auto; align-items: stretch; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  .section-title { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 0 0 12px; }
+  .row-flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn { padding: 12px 16px; border-radius: 10px; font-weight: 700; color: #1a0a1f; }
+  .btn-open { background: linear-gradient(90deg, var(--green), #3bc7ff); }
+  .btn-next { background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+  .btn-danger { background: var(--pink); color: white; }
+  .btn-ghost { background: rgba(255,255,255,0.1); color: var(--text); border: 1px solid var(--card-border); }
+  .btn-small { padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; }
+  .queue-card { display:flex; align-items:center; justify-content:space-between; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.05); border:1px solid var(--card-border); margin-bottom:8px; }
+  .current-judge { text-align: center; padding: 18px; }
+  .current-judge .cname { font-size: 1.6rem; font-weight: 800; margin-bottom: 14px; }
+  .judge-btns { display:flex; gap:10px; justify-content:center; flex-wrap: wrap; }
+  .team-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background: rgba(255,255,255,0.04); margin-bottom:6px; }
+  .team-row .left { display:flex; align-items:center; gap:8px; }
+  .score-ctrl { display:flex; align-items:center; gap:6px; }
+  #qrbox { background: white; padding: 10px; border-radius: 12px; display:inline-block; }
+  .join-url { word-break: break-all; text-align:center; color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
+  .locked-badge { font-size:0.75rem; color: var(--pink); margin-left:6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">🌶️ 2 SPICY — CONTRÔLE 🌶️</div>
+
+  <div id="authGate" class="card" style="display:none; max-width:400px;">
+    <input type="text" id="pwInput" placeholder="Mot de passe hôte" />
+    <button class="btn-primary" id="pwBtn">Entrer</button>
+    <div class="error" id="pwError"></div>
+  </div>
+
+  <div id="panel" style="display:none; width:100%;">
+    <div class="grid">
+      <div class="card">
+        <div class="section-title">Rejoindre la partie</div>
+        <div style="text-align:center;">
+          <div id="qrbox"></div>
+          <div class="join-url" id="joinUrl"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Manche <span id="roundNum">1</span></div>
+        <div class="row-flex">
+          <button class="btn btn-open" id="openBtn">Ouvrir les buzz</button>
+          <button class="btn btn-next" id="nextBtn">Manche suivante</button>
+        </div>
+        <div style="margin-top:14px;">
+          <div class="current-judge" id="judgePanel">
+            <div class="cname" id="judgeName">En attente d'un buzz...</div>
+            <div class="judge-btns" id="judgeBtns" style="display:none;">
+              <button class="btn" style="background:var(--green); color:#0a1f14;" id="pts2">✓✓ 2 pts (titre + artiste)</button>
+              <button class="btn" style="background:#ffe08a; color:#3a2c00;" id="pts1">✓ 1 pt (un seul)</button>
+              <button class="btn btn-danger" id="pts0">✗ Faux</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="section-title">File des buzz</div>
+      <div id="queueBox"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="section-title">Équipes</div>
+      <div id="teamsBox"></div>
+      <div class="row-flex" style="margin-top:12px;">
+        <input type="text" id="addTeamInput" placeholder="Ajouter une équipe manuellement" style="flex:1; min-width:200px;" />
+        <button class="btn btn-ghost" id="addTeamBtn">Ajouter</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px; text-align:center;">
+      <button class="btn btn-danger" id="resetBtn">Réinitialiser toute la partie</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const authGate = document.getElementById('authGate');
+const panel = document.getElementById('panel');
+
+// --- Auth ---
+socket.emit('hostAuth', localStorage.getItem('2spicy_hostpw') || '');
+socket.on('hostAuthOk', () => { authGate.style.display = 'none'; panel.style.display = 'block'; init(); });
+socket.on('hostAuthError', (msg) => {
+  authGate.style.display = 'block';
+  document.getElementById('pwError').textContent = msg;
+});
+document.getElementById('pwBtn').addEventListener('click', () => {
+  const pw = document.getElementById('pwInput').value;
+  localStorage.setItem('2spicy_hostpw', pw);
+  socket.emit('hostAuth', pw);
+});
+
+let inited = false;
+function init() {
+  if (inited) return;
+  inited = true;
+  const joinUrl = location.origin + '/play';
+  document.getElementById('joinUrl').textContent = joinUrl;
+  new QRCode(document.getElementById('qrbox'), { text: joinUrl, width: 160, height: 160 });
+}
+
+document.getElementById('openBtn').addEventListener('click', () => socket.emit('openBuzz'));
+document.getElementById('nextBtn').addEventListener('click', () => socket.emit('nextRound'));
+document.getElementById('pts2').addEventListener('click', () => socket.emit('judge', { points: 2 }));
+document.getElementById('pts1').addEventListener('click', () => socket.emit('judge', { points: 1 }));
+document.getElementById('pts0').addEventListener('click', () => socket.emit('judge', { points: 0 }));
+document.getElementById('addTeamBtn').addEventListener('click', () => {
+  const input = document.getElementById('addTeamInput');
+  if (input.value.trim()) { socket.emit('addTeamManual', { name: input.value.trim() }); input.value = ''; }
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Réinitialiser toute la partie (équipes + scores) ?')) socket.emit('resetGame');
+});
+
+socket.on('state', (state) => {
+  document.getElementById('roundNum').textContent = state.round;
+
+  const judgeName = document.getElementById('judgeName');
+  const judgeBtns = document.getElementById('judgeBtns');
+  const currentId = state.queue.length ? state.queue[0].teamId : null;
+  if (currentId && state.teams[currentId]) {
+    judgeName.textContent = '🔥 ' + state.teams[currentId].name;
+    judgeBtns.style.display = 'flex';
+  } else {
+    judgeName.textContent = state.buzzOpen ? "En attente d'un buzz..." : 'Buzz fermés';
+    judgeBtns.style.display = 'none';
+  }
+
+  const queueBox = document.getElementById('queueBox');
+  if (!state.queue.length) {
+    queueBox.innerHTML = '<div style="color:var(--muted); text-align:center; padding:10px;">Aucun buzz pour l\'instant</div>';
+  } else {
+    queueBox.innerHTML = state.queue.map((q, i) => {
+      const t = state.teams[q.teamId];
+      if (!t) return '';
+      return `<div class="queue-card"><span><span class="dot" style="background:${t.color}"></span> #${i+1} ${t.name}</span></div>`;
+    }).join('');
+  }
+
+  const teamsBox = document.getElementById('teamsBox');
+  const sorted = Object.values(state.teams).sort((a,b) => b.score - a.score);
+  if (!sorted.length) {
+    teamsBox.innerHTML = '<div style="color:var(--muted);">Aucune équipe pour l\'instant. Faites scanner le QR code !</div>';
+  } else {
+    teamsBox.innerHTML = sorted.map(t => `
+      <div class="team-row">
+        <div class="left">
+          <span class="dot" style="background:${t.color}"></span>
+          <span>${t.name}</span>
+          ${!t.connected ? '<span class="locked-badge">déconnecté</span>' : ''}
+          ${t.locked ? '<span class="locked-badge">🔒 bloqué</span>' : ''}
+        </div>
+        <div class="score-ctrl">
+          <button class="btn btn-ghost btn-small" onclick="adjust('${t.id}', -1)">−</button>
+          <strong>${t.score}</strong>
+          <button class="btn btn-ghost btn-small" onclick="adjust('${t.id}', 1)">+</button>
+          <button class="btn btn-danger btn-small" onclick="removeTeam('${t.id}')">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+});
+
+function adjust(teamId, delta) { socket.emit('adjustScore', { teamId, delta }); }
+function removeTeam(teamId) { if (confirm('Retirer cette équipe ?')) socket.emit('removeTeam', { teamId }); }
+</script>
+</body>
+</html>

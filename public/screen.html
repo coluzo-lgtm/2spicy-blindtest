@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2 Spicy — Écran</title>
+<style>
+  html, body {
+    margin: 0; height: 100%;
+    background: radial-gradient(circle at 50% -10%, #3a1240 0%, #16091f 60%), #16091f;
+    color: #fff4ec;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+  }
+  .top {
+    text-align: center;
+    padding: 3vh 0 1vh;
+  }
+  .title {
+    font-size: 5vw;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #ff3b6b, #ff8c3b, #ffd23b);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .round {
+    font-size: 2vw;
+    color: #c9a9c9;
+    margin-top: 0.5vh;
+  }
+  .layout {
+    display: flex;
+    height: 78vh;
+    padding: 0 4vw;
+    gap: 3vw;
+  }
+  .board {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4vh;
+    justify-content: center;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 1.5vw;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 1.2vh 2vw;
+    transition: all 0.4s ease;
+  }
+  .row.locked { opacity: 0.45; }
+  .rank { font-size: 2vw; font-weight: 900; width: 3vw; color: #c9a9c9; }
+  .dot { width: 2vw; height: 2vw; border-radius: 50%; flex-shrink: 0; }
+  .name { font-size: 2.4vw; font-weight: 700; flex: 1; }
+  .lock { font-size: 1.6vw; }
+  .score { font-size: 2.8vw; font-weight: 900; min-width: 4vw; text-align: right; }
+  .bump { animation: bump 0.6s ease; }
+  @keyframes bump {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.06); box-shadow: 0 0 40px rgba(59,255,176,0.5); }
+    100% { transform: scale(1); }
+  }
+  .queue-panel {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 2vh 1.5vw;
+    display: flex;
+    flex-direction: column;
+  }
+  .queue-title {
+    font-size: 1.6vw;
+    color: #c9a9c9;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1.5vh;
+    text-align: center;
+  }
+  .queue-empty {
+    color: #6b5a70;
+    text-align: center;
+    margin-top: 4vh;
+    font-size: 1.4vw;
+  }
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+    padding: 1.2vh 1vw;
+    border-radius: 12px;
+    margin-bottom: 1vh;
+    font-size: 1.8vw;
+    font-weight: 700;
+  }
+  .queue-item.first {
+    background: linear-gradient(90deg, rgba(255,59,107,0.35), rgba(255,140,59,0.25));
+    box-shadow: 0 0 30px rgba(255,59,107,0.35);
+    font-size: 2.2vw;
+  }
+  .queue-item:not(.first) { background: rgba(255,255,255,0.05); opacity: 0.75; }
+  .queue-pos { color: #c9a9c9; width: 1.5vw; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="title">🌶️ 2 SPICY BLIND TEST 🌶️</div>
+    <div class="round" id="roundLabel">Manche 1</div>
+  </div>
+  <div class="layout">
+    <div class="board" id="board"></div>
+    <div class="queue-panel">
+      <div class="queue-title">Qui a buzzé ?</div>
+      <div id="queueList"></div>
+    </div>
+  </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const board = document.getElementById('board');
+const queueList = document.getElementById('queueList');
+const roundLabel = document.getElementById('roundLabel');
+let prevScores = {};
+
+socket.on('state', (state) => {
+  roundLabel.textContent = 'Manche ' + state.round;
+
+  const sorted = Object.values(state.teams).sort((a, b) => b.score - a.score);
+  board.innerHTML = sorted.map((t, i) => {
+    const bumped = prevScores[t.id] !== undefined && prevScores[t.id] !== t.score;
+    return `
+      <div class="row ${t.locked ? 'locked' : ''} ${bumped ? 'bump' : ''}">
+        <div class="rank">#${i + 1}</div>
+        <div class="dot" style="background:${t.color}"></div>
+        <div class="name">${t.name}</div>
+        ${t.locked ? '<div class="lock">🔒</div>' : ''}
+        <div class="score">${t.score}</div>
+      </div>
+    `;
+  }).join('');
+
+  sorted.forEach(t => { prevScores[t.id] = t.score; });
+
+  if (!state.queue.length) {
+    queueList.innerHTML = '<div class="queue-empty">En attente des buzz...</div>';
+  } else {
+    queueList.innerHTML = state.queue.map((q, i) => {
+      const team = state.teams[q.teamId];
+      if (!team) return '';
+      return `
+        <div class="queue-item ${i === 0 ? 'first' : ''}">
+          <span class="queue-pos">${i + 1}</span>
+          <span class="dot" style="background:${team.color}"></span>
+          <span>${team.name}</span>
+        </div>
+      `;
+    }).join('');
+  }
+});
+</script>
+</body>
+</html>
