@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>2 Spicy — Contrôle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
 <style>
   .wrap { max-width: 900px; margin: 0 auto; align-items: stretch; }
@@ -17,21 +20,22 @@
   .btn-danger { background: var(--pink); color: white; }
   .btn-ghost { background: rgba(255,255,255,0.1); color: var(--text); border: 1px solid var(--card-border); }
   .btn-small { padding: 6px 12px; font-size: 0.85rem; border-radius: 8px; }
-  .queue-card { display:flex; align-items:center; justify-content:space-between; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,0.05); border:1px solid var(--card-border); margin-bottom:8px; }
+  .queue-card { display:flex; align-items:center; justify-content:space-between; padding: 12px 14px; border-radius: 12px; background: rgba(16,31,222,0.18); border:1px solid var(--card-border); margin-bottom:8px; }
   .current-judge { text-align: center; padding: 18px; }
-  .current-judge .cname { font-size: 1.6rem; font-weight: 800; margin-bottom: 14px; }
+  .current-judge .cname { font-size: 1.6rem; font-weight: 800; margin-bottom: 14px; color: var(--yellow); }
   .judge-btns { display:flex; gap:10px; justify-content:center; flex-wrap: wrap; }
-  .team-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background: rgba(255,255,255,0.04); margin-bottom:6px; }
+  .team-row { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:10px; background: rgba(16,31,222,0.14); margin-bottom:6px; }
   .team-row .left { display:flex; align-items:center; gap:8px; }
   .score-ctrl { display:flex; align-items:center; gap:6px; }
   #qrbox { background: white; padding: 10px; border-radius: 12px; display:inline-block; }
   .join-url { word-break: break-all; text-align:center; color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
-  .locked-badge { font-size:0.75rem; color: var(--pink); margin-left:6px; }
+  .locked-badge { font-size:0.75rem; color: var(--yellow); margin-left:6px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="logo">🌶️ 2 SPICY — CONTRÔLE 🌶️</div>
+  <img class="logo" src="2.png" alt="2 Spicy" style="max-width:220px;" />
+  <div class="sub">Contrôle</div>
 
   <div id="authGate" class="card" style="display:none; max-width:400px;">
     <input type="text" id="pwInput" placeholder="Mot de passe hôte" />

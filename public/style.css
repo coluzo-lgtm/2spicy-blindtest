@@ -1,14 +1,14 @@
 :root {
-  --bg: #08081c;
-  --bg2: #150c3d;
+  --bg: #F60097;
+  --bg2: #c2007e;
   --pink: #F60097;
   --blue: #101FDE;
   --yellow: #FCFA0B;
   --green: #3bffb0;
-  --text: #fff4ec;
-  --muted: #b3aee0;
-  --card: rgba(255, 255, 255, 0.06);
-  --card-border: rgba(255, 255, 255, 0.12);
+  --text: #ffffff;
+  --muted: #ffcdea;
+  --card: rgba(16, 31, 222, 0.22);
+  --card-border: rgba(16, 31, 222, 0.55);
 }
 
 * { box-sizing: border-box; }
@@ -17,9 +17,9 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: radial-gradient(circle at 20% 0%, var(--bg2) 0%, var(--bg) 55%), var(--bg);
+  background: var(--bg);
   color: var(--text);
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Anton', 'Segoe UI', system-ui, -apple-system, sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -32,13 +32,16 @@ html, body {
 }
 
 .logo {
+  display: block;
+  max-width: min(80vw, 320px);
+  height: auto;
+  margin: 8px auto 4px;
+}
+.logo-text {
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: 1px;
-  background: linear-gradient(90deg, var(--pink), var(--blue), var(--yellow));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--yellow);
   text-align: center;
   margin: 8px 0 4px;
 }
@@ -65,12 +68,13 @@ input[type="text"] {
   padding: 14px 16px;
   border-radius: 12px;
   border: 1px solid var(--card-border);
-  background: rgba(0,0,0,0.25);
+  background: rgba(10,8,40,0.4);
   color: var(--text);
   font-size: 1.05rem;
   outline: none;
 }
-input[type="text"]:focus { border-color: var(--pink); }
+input[type="text"]:focus { border-color: var(--blue); }
+input[type="text"]::placeholder { color: #ffd6ee; opacity: 0.7; }
 
 button {
   font-family: inherit;
@@ -85,13 +89,13 @@ button {
   border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0a0a1f;
-  background: linear-gradient(90deg, var(--yellow), var(--pink));
+  color: #ffffff;
+  background: linear-gradient(90deg, var(--blue), #4d5aff);
 }
 .btn-primary:active { transform: scale(0.98); }
 
 .error {
-  color: var(--pink);
+  color: var(--yellow);
   font-size: 0.9rem;
   margin-top: 10px;
   min-height: 1em;
@@ -103,9 +107,9 @@ button {
   border-radius: 50%;
   font-size: 1.8rem;
   font-weight: 900;
-  color: #0a0a1f;
-  background: radial-gradient(circle at 35% 30%, #fffcb0, var(--yellow) 45%, var(--pink) 100%);
-  box-shadow: 0 0 0 8px rgba(246,0,151,0.15), 0 10px 40px rgba(16,31,222,0.45);
+  color: #ffffff;
+  background: radial-gradient(circle at 35% 30%, #6f7aff, var(--blue) 55%, #0a0e8f 100%);
+  box-shadow: 0 0 0 8px rgba(16,31,222,0.25), 0 10px 40px rgba(16,31,222,0.55);
   margin: 30px auto;
   display: flex;
   align-items: center;
@@ -115,12 +119,13 @@ button {
 }
 .buzz-btn:active { transform: scale(0.95); }
 .buzz-btn.disabled {
-  background: #3a2c40;
-  color: #8a7c92;
+  background: #6b1358;
+  color: #e0a8cd;
   box-shadow: none;
 }
 .buzz-btn.buzzed {
   background: radial-gradient(circle at 35% 30%, #b6ffe0, var(--green) 60%);
+  color: #0a0a1f;
 }
 
 .status-line {
@@ -147,6 +152,7 @@ button {
   font-weight: 900;
   text-align: center;
   margin: 10px 0 0;
+  color: var(--yellow);
 }
 
 .mini-board {
@@ -172,8 +178,8 @@ button {
   margin-top: 14px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(246,0,151,0.15);
-  color: var(--pink);
+  background: rgba(16,31,222,0.35);
+  color: var(--yellow);
   font-weight: 700;
   font-size: 0.9rem;
 }

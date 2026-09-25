@@ -4,33 +4,34 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>2 Spicy — Écran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
 <style>
   html, body {
     margin: 0; height: 100%;
-    background: radial-gradient(circle at 50% -10%, #150c3d 0%, #08081c 60%), #08081c;
-    color: #fff4ec;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #F60097;
+    color: #ffffff;
+    font-family: 'Anton', 'Segoe UI', system-ui, -apple-system, sans-serif;
     overflow: hidden;
   }
   .top {
     text-align: center;
     padding: 3vh 0 1vh;
   }
-  .title {
-    font-size: 5vw;
-    font-weight: 900;
-    letter-spacing: 2px;
-    background: linear-gradient(90deg, #F60097, #101FDE, #FCFA0B);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+  .logo-img {
+    max-height: 12vh;
+    max-width: 60vw;
   }
   .round {
     font-size: 2vw;
-    color: #c9a9c9;
+    color: #ffe3f4;
     margin-top: 0.5vh;
+    font-weight: 700;
   }
   .layout {
     display: flex;
-    height: 78vh;
+    height: 76vh;
     padding: 0 4vw;
     gap: 3vw;
   }
@@ -45,28 +46,28 @@
     display: flex;
     align-items: center;
     gap: 1.5vw;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(16,31,222,0.28);
+    border: 1px solid rgba(16,31,222,0.7);
     border-radius: 16px;
     padding: 1.2vh 2vw;
     transition: all 0.4s ease;
   }
   .row.locked { opacity: 0.45; }
-  .rank { font-size: 2vw; font-weight: 900; width: 3vw; color: #c9a9c9; }
+  .rank { font-size: 2vw; font-weight: 900; width: 3vw; color: #FCFA0B; }
   .dot { width: 2vw; height: 2vw; border-radius: 50%; flex-shrink: 0; }
   .name { font-size: 2.4vw; font-weight: 700; flex: 1; }
   .lock { font-size: 1.6vw; }
-  .score { font-size: 2.8vw; font-weight: 900; min-width: 4vw; text-align: right; }
+  .score { font-size: 2.8vw; font-weight: 900; min-width: 4vw; text-align: right; color: #FCFA0B; }
   .bump { animation: bump 0.6s ease; }
   @keyframes bump {
     0% { transform: scale(1); }
-    30% { transform: scale(1.06); box-shadow: 0 0 40px rgba(59,255,176,0.5); }
+    30% { transform: scale(1.06); box-shadow: 0 0 40px rgba(16,31,222,0.7); }
     100% { transform: scale(1); }
   }
   .queue-panel {
     flex: 1;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(16,31,222,0.35);
+    border: 2px solid #101FDE;
     border-radius: 20px;
     padding: 2vh 1.5vw;
     display: flex;
@@ -74,14 +75,15 @@
   }
   .queue-title {
     font-size: 1.6vw;
-    color: #c9a9c9;
+    color: #FCFA0B;
     text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: 1.5vh;
     text-align: center;
+    font-weight: 800;
   }
   .queue-empty {
-    color: #6b5a70;
+    color: #ffcdea;
     text-align: center;
     margin-top: 4vh;
     font-size: 1.4vw;
@@ -97,17 +99,17 @@
     font-weight: 700;
   }
   .queue-item.first {
-    background: linear-gradient(90deg, rgba(246,0,151,0.35), rgba(16,31,222,0.3));
-    box-shadow: 0 0 30px rgba(246,0,151,0.35);
+    background: linear-gradient(90deg, rgba(252,250,11,0.4), rgba(16,31,222,0.35));
+    box-shadow: 0 0 30px rgba(252,250,11,0.4);
     font-size: 2.2vw;
   }
-  .queue-item:not(.first) { background: rgba(255,255,255,0.05); opacity: 0.75; }
-  .queue-pos { color: #c9a9c9; width: 1.5vw; }
+  .queue-item:not(.first) { background: rgba(16,31,222,0.2); opacity: 0.85; }
+  .queue-pos { color: #FCFA0B; width: 1.5vw; }
 </style>
 </head>
 <body>
   <div class="top">
-    <div class="title">🌶️ 2 SPICY BLIND TEST 🌶️</div>
+    <img class="logo-img" src="2.png" alt="2 Spicy Blind Test" />
     <div class="round" id="roundLabel">Manche 1</div>
   </div>
   <div class="layout">
